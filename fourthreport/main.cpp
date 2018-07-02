@@ -3,7 +3,7 @@
 #include <fstream> //for open
 #include <string> //for string
 #include <sstream> //for split
-
+#include <time.h> //for clock
 
 using namespace std;
 
@@ -26,6 +26,8 @@ private:
     //続いている値を取り出すので前回どこまで回したかを記録しておく
     int forloopmark;
 };
+
+
 LinerComplement::LinerComplement(string filename){
     /*
     第一引数：ファイルの名前
@@ -61,6 +63,7 @@ LinerComplement::LinerComplement(string filename){
 
 };
 
+
 template <typename MayBefloat>
 float LinerComplement::XIntoY(MayBefloat x){
     /*
@@ -77,10 +80,11 @@ float LinerComplement::XIntoY(MayBefloat x){
     }
     
     //前回のループの最初からスタート
-    int xindex = this->forloopmark;
+    int xindex = this->forloopmark -1;
 
     //一周ぶん回そうとするが前回の続きから
-    for(int i=0; i <= xarray.size() -1 ; i++){
+    int i;
+    for( i=0; i <= xarray.size() -1 ; i++){
         xindex++;
         //一周回すために最後まで行ったら最初に戻る
         if(xindex > xarray.size()-1){
@@ -92,7 +96,8 @@ float LinerComplement::XIntoY(MayBefloat x){
     }
     this->forloopmark = xindex;
     
-   /*
+    /*
+    //シンプルだが遅い
     int xindex;
     for( xindex=0 ; xindex<xarray.size() ; xindex++){
         if(xarray[xindex]<x && x<xarray[xindex + 1]){
@@ -100,6 +105,7 @@ float LinerComplement::XIntoY(MayBefloat x){
         }
     }
     */
+    
     
     float x1 = xarray[xindex];
     float y1 = yarray[xindex];
@@ -113,6 +119,7 @@ float LinerComplement::XIntoY(MayBefloat x){
     return a*x+b;
 }
 
+
 //split関数をクラス内部に入れました。
 vector <string> LinerComplement::split(const string& input ,char delimiter){
     istringstream stream(input);
@@ -124,33 +131,10 @@ vector <string> LinerComplement::split(const string& input ,char delimiter){
     return result;
 }
 
-/*
-float LinerComplement::XMin(){
-    //xarrayの最小値を返す関数
-    
-    float min = xarray[0];
-    for(int i = 0; i <= xarray.size() ; ++i) {
-        if (min < xarray[i]){
-            min = xarray[i];
-        }
-    }
-    return min;
-}
 
-float LinerComplement::XMax(){
-    //xarrayの最小値を返す関数
-
-    float max = xarray[0];
-    for(int i = 0; i <= xarray.size() ; ++i) {
-        if (max > xarray[i]){
-            max = xarray[i];
-        }
-    }
-    return max;
-}
-*/
 
 int main(void){
+    clock_t start = clock();
     LinerComplement Obj("input2.text");
     float x;
     ofstream file("classresult.text");
@@ -158,6 +142,8 @@ int main(void){
         file<<x<<"    "<<Obj.XIntoY(x)<<endl;
     }
     file.close();
+    clock_t end = clock();
+    cout << "duration = " << (double)(end - start) / CLOCKS_PER_SEC << "sec.\n";
     return 0;
 }
 
